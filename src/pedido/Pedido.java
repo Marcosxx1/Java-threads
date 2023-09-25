@@ -11,7 +11,7 @@ public class Pedido {
      * Construtor da classe Pedido.
      *
      * @param nome O nome do pedido.
-     * @param tempoPreparo O tempo estimado de preparo do pedido em minutos.
+     * @param tempoPreparo O tempo estimado de preparo do pedido em milissegundos.
      * @param categoria A categoria do pedido (ex: pizza, hambúrguer, sobremesa).
      */
     public Pedido(String nome, int tempoPreparo, String categoria) {
@@ -32,7 +32,7 @@ public class Pedido {
     /**
      * Obtém o tempo de preparo do pedido.
      *
-     * @return Um valor inteiro representando o tempo estimado de preparo do pedido em minutos.
+     * @return Um valor inteiro representando o tempo estimado de preparo do pedido em milisegundos.
      */
     public int getTempoPreparo() {
         return tempoPreparo;
