@@ -1,4 +1,16 @@
 package pedido;
+
+/*	TSI 3713 Sistemas Distribuídos
+    Professor: 
+	Rodrigo Andrade Cardoso
+	
+	Alunos:
+	Luiz Ferreira Neto
+  	Pablo Ruan Dias
+ 	Marcos Alexandre da Silva
+ 
+ */
+
 /**
  * Classe que representa um pedido.
  */
