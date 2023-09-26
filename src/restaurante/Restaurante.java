@@ -10,6 +10,17 @@ import cliente.Cliente;
 import cozinheiro.Cozinheiro;
 import pedido.Pedido;
 
+/*	TSI 3713 Sistemas Distribuídos
+    Professor: 
+	Rodrigo Andrade Cardoso
+	
+	Alunos:
+	Luiz Ferreira Neto
+  	Pablo Ruan Dias
+ 	Marcos Alexandre da Silva
+ 
+ */
+
 /**
  * Classe principal que representa o restaurante e inicia a simulação do restaurante.
  */
