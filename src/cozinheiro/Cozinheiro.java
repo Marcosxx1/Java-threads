@@ -4,7 +4,16 @@ import java.util.Queue;
 
 import pedido.Pedido;
 import java.util.Queue;
-
+/*	TSI 3713 Sistemas Distribuídos
+    Professor: 
+	Rodrigo Andrade Cardoso
+	
+	Alunos:
+	Luiz Ferreira Neto
+  	Pablo Ruan Dias
+ 	Marcos Alexandre da Silva
+ 
+ */
 /**
  * Classe que representa um cozinheiro responsável por preparar pedidos.
  */
