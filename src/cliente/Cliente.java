@@ -2,7 +2,16 @@ package cliente;
 import java.util.List;
 import java.util.Queue;
 import java.util.Random;
-
+/*	TSI 3713 Sistemas Distribuídos
+    Professor: 
+	Rodrigo Andrade Cardoso
+	
+	Alunos:
+	Luiz Ferreira Neto
+  	Pablo Ruan Dias
+ 	Marcos Alexandre da Silva
+ 
+ */
 import pedido.Pedido;
 /**
  * Classe que representa um cliente que faz pedidos e aguarda a entrega dos mesmos.
