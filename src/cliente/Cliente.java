@@ -1,66 +1,63 @@
+/**
+ * A classe Cliente representa um cliente que faz pedidos em um restaurante.
+ */
 package cliente;
-import java.util.List;
-import java.util.Queue;
+
 import java.util.Random;
+import java.util.concurrent.BlockingQueue;
 
 import pedido.Pedido;
-/**
- * Classe que representa um cliente que faz pedidos e aguarda a entrega dos mesmos.
- */
-public class Cliente implements Runnable {
+import restaurante.NotificadorCliente;
+
+public class Cliente extends Thread {
     private String nome;
-    private Queue<Pedido> filaPedidos;
-    private List<Pedido> pedidosProntos;
+    private BlockingQueue<Pedido> filaPedidos;
+    private NotificadorCliente notificador;
 
     /**
-     * Construtor da classe Cliente.
+     * Construtor para criar um objeto Cliente.
      *
-     * @param nome           O nome do cliente.
-     * @param filaPedidos    A fila de pedidos onde o cliente coloca seus pedidos.
-     * @param pedidosProntos A lista onde os pedidos prontos serão armazenados.
+     * @param nome O nome do cliente.
+     * @param filaPedidos A fila de pedidos onde o cliente coloca seus pedidos.
+     * @param notificador O notificador de cliente usado para receber notificações sobre os pedidos.
      */
-    public Cliente(String nome, Queue<Pedido> filaPedidos, List<Pedido> pedidosProntos) {
+    public Cliente(String nome, BlockingQueue<Pedido> filaPedidos, NotificadorCliente notificador) {
         this.nome = nome;
         this.filaPedidos = filaPedidos;
-        this.pedidosProntos = pedidosProntos;
+        this.notificador = notificador;
     }
 
     /**
-     * Implementação do método run() da interface Runnable.
-     * Este método é executado quando a thread do cliente é iniciada.
+     * O método run() é chamado quando a thread do cliente é iniciada.
+     * O cliente faz três pedidos de diferentes categorias (entrada, prato principal, sobremesa)
+     * e coloca esses pedidos na fila de pedidos do restaurante.
      */
     @Override
     public void run() {
         for (int i = 0; i < 3; i++) {
-            Pedido pedido = criarPedidoAleatorio();
-            System.out.println(nome + " fez um pedido: " + pedido.getNome());
-            filaPedidos.add(pedido);
-            synchronized (filaPedidos) {
-                filaPedidos.notify(); // Notificar a equipe da cozinha sobre um novo pedido
+            // Crie um pedido de acordo com a categoria (entrada, prato principal, sobremesa)
+            String categoria;
+            if (i == 0) {
+                categoria = "entrada";
+            } else if (i == 1) {
+                categoria = "prato principal";
+            } else {
+                categoria = "sobremesa";
             }
-            synchronized (pedido) {
-                try {
-                    pedido.wait(); // Aguardar até que o pedido seja preparado
-                    pedidosProntos.add(pedido);
-                    System.out.println(nome + " recebeu seu pedido: " + pedido.getNome());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            
+            Random random = new Random();
+            int tempoPreparo = random.nextInt(3900) + 100; // De 100 a 4000 milissegundos
+
+            Pedido pedido = new Pedido(nome, tempoPreparo, categoria);
+            
+            try {
+                filaPedidos.put(pedido); // Adicione o pedido à fila
+                System.out.println(nome + " fez um pedido: " + pedido);
+                sleep(tempoPreparo); // Simula o cliente esperando pelo pedido
+                notificador.notificarCliente(nome + ", seu pedido está pronto: " + pedido);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
-    }
-
-    /**
-     * Método privado para criar um pedido aleatório.
-     *
-     * @return Um objeto Pedido com características aleatórias.
-     */
-    private Pedido criarPedidoAleatorio() {
-        String[] itens = {"Entrada 1", "Entrada 2", "Prato Principal 1", "Prato Principal 2", "Sobremesa 1", "Sobremesa 2"};
-        String nomePedido = itens[new Random().nextInt(itens.length)];
-        int tempoPreparo = new Random().nextInt(3901) + 100; // Entre 100 e 4000 ms
-        String categoria = nomePedido.contains("Entrada") ? "entrada" :
-                (nomePedido.contains("Prato Principal") ? "prato principal" : "sobremesa");
-        return new Pedido(nomePedido, tempoPreparo, categoria);
     }
 }

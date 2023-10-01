@@ -1,79 +1,45 @@
-# Documentação do Código do Restaurante
+# Restaurante Simulado
 
-Este código Java representa um sistema de restaurante simples, onde clientes fazem pedidos aleatórios e cozinheiros preparam esses pedidos. O sistema é implementado usando threads para representar clientes e cozinheiros, com uma fila de pedidos para coordenar o fluxo de trabalho.
+Este é um programa de simulação de restaurante que demonstra como clientes fazem pedidos e cozinheiros preparam esses pedidos em um ambiente concorrente.
 
-## Classes Principais
+## Classes
 
-### 1. `Pedido`
+### `Restaurante`
 
-A classe `Pedido` representa um pedido feito por um cliente no restaurante. Cada pedido possui três atributos:
+A classe `Restaurante` é a classe principal que inicia a simulação. Ela cria um número aleatório de cozinheiros e clientes e os inicia para simular a operação do restaurante.
 
-- `nome`: O nome do item do menu.
-- `tempoPreparo`: O tempo estimado necessário para preparar o pedido em milissegundos.
-- `categoria`: A categoria do pedido, como "entrada", "prato principal" ou "sobremesa".
+### `Cozinheiro`
 
-#### Métodos Principais:
+A classe `Cozinheiro` representa um cozinheiro que prepara os pedidos. Cada cozinheiro é executado em sua própria thread e retira pedidos da fila, prepara-os e notifica os clientes quando estão prontos.
 
-- `Pedido(String nome, int tempoPreparo, String categoria)`: O construtor da classe `Pedido` que inicializa os atributos do pedido.
+### `Cliente`
 
-- `getNome()`: Retorna o nome do pedido.
+A classe `Cliente` representa um cliente que faz pedidos. Cada cliente é executado em sua própria thread e faz três pedidos de diferentes categorias (entrada, prato principal, sobremesa). Os pedidos são adicionados à fila de pedidos do restaurante.
 
-- `getTempoPreparo()`: Retorna o tempo estimado de preparo do pedido.
+### `Pedido`
 
-- `getCategoria()`: Retorna a categoria do pedido.
+A classe `Pedido` representa um pedido com informações como nome, tempo de preparo e categoria. Ela é usada para representar os pedidos feitos pelos clientes.
 
-### 2. `Cliente`
+### `NotificadorCliente`
 
-A classe `Cliente` representa um cliente que faz pedidos no restaurante. Cada cliente é executado em uma thread separada. Os clientes fazem pedidos aleatórios e aguardam a entrega desses pedidos.
+A classe `NotificadorCliente` é usada para notificar os clientes quando seus pedidos estão prontos.
 
-#### Atributos:
+## Execução
 
-- `nome`: O nome do cliente.
-- `filaPedidos`: Uma fila de pedidos que armazena os pedidos feitos pelos clientes.
-- `pedidosProntos`: Uma lista que armazena os pedidos prontos para entrega.
+Para executar o programa, você pode simplesmente executar a classe `Restaurante`. O número de clientes e cozinheiros é gerado aleatoriamente no código.
 
-#### Métodos Principais:
+## Observações
 
-- `Cliente(String nome, Queue<Pedido> filaPedidos, List<Pedido> pedidosProntos)`: O construtor da classe `Cliente` que inicializa os atributos do cliente.
+Este é um programa de simulação e não representa um restaurante real. Ele foi criado apenas para fins de demonstração de conceitos de concorrência em Java.
+## Uso de BlockingQueue em vez de Queue
 
-- `run()`: O método `run` da interface `Runnable` representa o comportamento do cliente. Cada cliente faz três pedidos aleatórios e aguarda a entrega de cada pedido.
+Neste programa, escolhemos usar uma `BlockingQueue` em vez de uma `Queue` normal para a gestão da fila de pedidos. A principal razão para essa escolha é a necessidade de lidar com concorrência de forma eficaz e segura em um ambiente simulado de restaurante.
 
-- `criarPedidoAleatorio()`: Método privado que cria um pedido aleatório com base em itens de menu pré-definidos.
+- **Concorrência Segura**: A `BlockingQueue` oferece recursos de sincronização incorporados, o que garante que várias threads possam acessar a fila de pedidos de forma segura e coordenada. Em um ambiente concorrente como um restaurante simulado, onde vários clientes fazem pedidos simultaneamente e vários cozinheiros preparam esses pedidos, a segurança é fundamental.
 
-### 3. `Cozinheiro`
+- **Coordenação Simples**: A `BlockingQueue` fornece métodos convenientes, como `put()` e `take()`, que facilitam a coordenação entre as threads. Os clientes podem adicionar pedidos à fila usando `put()`, e os cozinheiros podem retirar pedidos da fila usando `take()`. Isso simplifica muito a lógica de coordenação entre as partes envolvidas.
 
-A classe `Cozinheiro` representa um cozinheiro que prepara os pedidos na cozinha do restaurante. Cada cozinheiro é executado em uma thread separada. Os cozinheiros retiram pedidos da fila de pedidos e os preparam.
+- **Prevenção de Condições de Corrida**: A `BlockingQueue` ajuda a evitar condições de corrida, um problema comum em programas concorrentes. Ela garante que apenas um thread possa adicionar ou remover itens da fila de cada vez, evitando conflitos e garantindo que os pedidos sejam processados na ordem correta.
 
-#### Atributos:
+Essa escolha de design com uma `BlockingQueue` foi feita para garantir a correta execução do restaurante simulado, onde a coordenação eficaz entre clientes e cozinheiros é fundamental para o funcionamento adequado do sistema em um ambiente concorrencial.
 
-- `filaPedidos`: Uma fila de pedidos que armazena os pedidos a serem preparados.
-
-#### Métodos Principais:
-
-- `Cozinheiro(Queue<Pedido> filaPedidos)`: O construtor da classe `Cozinheiro` que inicializa a fila de pedidos.
-
-- `run()`: O método `run` da interface `Runnable` representa o comportamento do cozinheiro. Os cozinheiros continuamente verificam a fila de pedidos, preparam os pedidos e notificam os clientes quando os pedidos estão prontos.
-
-- `prepararPedido(Pedido pedido)`: Método privado que simula o processo de preparação de um pedido, incluindo o tempo de preparo.
-
-### 4. `Restaurante`
-
-A classe `Restaurante` é a classe principal do programa. Ela contém o método `main` que inicia o sistema do restaurante, criando clientes e cozinheiros aleatoriamente.
-
-#### Métodos Principais:
-
-- `main(String[] args)`: O método `main` cria uma fila de pedidos, uma lista de pedidos prontos e inicia um número aleatório de clientes e cozinheiros. O número de clientes e cozinheiros é determinado aleatoriamente dentro de intervalos específicos.
-
-## Funcionamento do Programa
-
-O programa funciona da seguinte forma:
-
-1. Um número aleatório de clientes e cozinheiros é criado no método `main`.
-
-2. Cada cozinheiro é executado em uma thread separada e continua verificando a fila de pedidos. Quando um pedido está na fila, o cozinheiro o prepara.
-
-3. Cada cliente é executado em uma thread separada e faz três pedidos aleatórios, colocando-os na fila de pedidos. Os clientes aguardam até que seus pedidos sejam preparados e, em seguida, recebem os pedidos prontos.
-
-4. O programa continua em execução indefinidamente até que seja interrompido manualmente.
-
-Esta documentação fornece uma visão geral do código do restaurante e seu funcionamento. Cada classe e método são explicados, permitindo uma compreensão clara do sistema de restaurante implementado.

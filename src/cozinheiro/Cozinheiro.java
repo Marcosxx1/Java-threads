@@ -1,65 +1,62 @@
+/**
+ * A classe Cozinheiro representa um cozinheiro em um restaurante que prepara pedidos.
+ */
 package cozinheiro;
 
-import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+/* 	 A fila de pedidos é uma instância da interface BlockingQueue que é usada para implementar o cenário produtor-consumidor
+ * em um ambiente multithreaded. 
+ * 
+ * 	 A interface BlockingQueue fornece métodos que podem ser usados para adicionar e remover
+ * elementos da fila, e também fornece métodos que podem ser usados para bloquear a thread até que a fila esteja não vazia
+ * ou não cheia.
+ * 	 Existem dois tipos de BlockingQueue: ilimitada e limitada. 
+ * 	 Uma fila ilimitada pode crescer quase indefinidamente, enquanto uma fila limitada tem uma capacidade máxima definida. 
+ * 
+ * 	 O mais importante ao projetar um programa produtor-consumidor
+ *  usando uma BlockingQueue ilimitada é que os consumidores devem ser capazes de consumir mensagens tão rapidamente quanto os 
+ *  produtores estão adicionando mensagens à fila. 
+ *  Caso contrário, a memória pode ficar cheia e teríamos uma exceção OutOfMemory*/
 
 import pedido.Pedido;
-import java.util.Queue;
+import restaurante.NotificadorCliente;
 
-/**
- * Classe que representa um cozinheiro responsável por preparar pedidos.
- */
-public class Cozinheiro implements Runnable {
-    private Queue<Pedido> filaPedidos;
+public class Cozinheiro extends Thread {
 
-    /**
-     * Construtor da classe Cozinheiro.
-     *
-     * @param filaPedidos A fila de pedidos a ser preparada pelo cozinheiro.
-     */
-    public Cozinheiro(Queue<Pedido> filaPedidos) {
-        this.filaPedidos = filaPedidos;
-    }
+	private BlockingQueue<Pedido> filaPedidos;
+	private NotificadorCliente notificador;
 
-    /**
-     * Implementação do método run() da interface Runnable.
-     * Este método é executado quando a thread do cozinheiro é iniciada.
-     */
-    @Override
-    public void run() {
-        while (true) {
-            synchronized (filaPedidos) {
-                // Aguardar até que haja pedidos na fila
-                while (filaPedidos.isEmpty()) {
-                    try {
-                        filaPedidos.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                // Retirar o primeiro pedido da fila e prepará-lo
-                Pedido pedido = filaPedidos.poll();
-                prepararPedido(pedido);
-                // Notificar o cliente que o pedido está pronto
-                synchronized (pedido) {
-                    pedido.notify();
-                }
-            }
-        }
-    }
+	/**
+	 * Construtor da classe Cozinheiro.
+	 * 
+	 * @param filaPedidos Fila de pedidos.
+	 * @param notificador Notificador de cliente.
+	 */
+	public Cozinheiro(BlockingQueue<Pedido> filaPedidos, NotificadorCliente notificador) {
+		this.filaPedidos = filaPedidos;
+		this.notificador = notificador;
+	}
 
-    /**
-     * Método privado para preparar um pedido.
-     *
-     * @param pedido O pedido a ser preparado.
-     */
-    private void prepararPedido(Pedido pedido) {
-        System.out.println("Preparando " + pedido.getCategoria() + ": " + pedido.getNome());
-        try {
-            // Simular o tempo de preparo do pedido com Thread.sleep()
-            Thread.sleep(pedido.getTempoPreparo());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Pedido " + pedido.getNome() + " pronto!");
-    }
+	/**
+	 * Método sobrescrito da classe Thread que é executado quando a thread é
+	 * iniciada. O método contém um loop infinito que retira um pedido da fila de
+	 * pedidos usando o método take(), simula o tempo de preparo do pedido usando o
+	 * método sleep(), imprime uma mensagem informando que o pedido foi preparado e
+	 * notifica o cliente que o pedido está pronto usando o método
+	 * notificarCliente().
+	 */
+	@Override
+	public void run() {
+		while (true) {
+			try {
+				Pedido pedido = filaPedidos.take(); // Retire um pedido da fila
+				System.out.println("Cozinheiro está preparando: " + pedido);
+				sleep(pedido.getTempoPreparo()); // Simula o tempo de preparo
+				System.out.println("Pedido preparado: " + pedido);
+				notificador.notificarCliente("Pedido pronto: " + pedido);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }
